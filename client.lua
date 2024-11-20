@@ -9,8 +9,6 @@ AddEventHandler("Robbery:updateblips", function(newBankStatus)
         end
     end
 
-    local myId = GetPlayerServerId(PlayerId())
-
     for k, v in pairs(newBankStatus) do
         if v ~= nil and LocalPlayer.state["gsrp:onDuty"] == "yes" then
             local blip = AddBlipForCoord(v.location)
@@ -37,7 +35,14 @@ for name, bank in pairs(Config.bankLocations) do
                 label = 'Rob ' .. name,
                 icon = 'fa-solid fa-sack-dollar',
                 onSelect = function(data)
-                    TriggerServerEvent("Robbery:trigger", name, bank)
+                    -- local success = lib.skillCheck({'easy', 'easy', {areaSize = 60, speedMultiplier = 2}, 'hard'}, {'w', 'a', 's', 'd'})
+                    local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy'}, {'w', 'a', 's', 'd'})
+                    if success then
+                        exports['okokNotify']:Alert('Bank Robbery', 'You have succesfully robbed the bank, Get to the waypoint to sell your loot.', 3000, 'success', true)
+                        TriggerServerEvent("Robbery:trigger", name, bank)
+                    else
+                        exports['okokNotify']:Alert('Robbery Failed', 'You have failed to hack the control panel.', 3000, 'error', true)
+                    end
                 end
             }
         },
@@ -53,7 +58,7 @@ for name, location in pairs(Config.sellLocations) do
             {
                 name = 'sell_location_' .. name,
                 label = 'Sell Cash',
-                icon = 'fa-solid dollar-sign',
+                icon = 'fa-solid fa-dollar-sign',
                 onSelect = function(data)
                     TriggerServerEvent("Robbery:sell", location)
                 end
